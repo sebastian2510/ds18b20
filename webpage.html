@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arduino Weather</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #refreshButton {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #weatherChart {
+            margin-top: 20px;
+            width: 60% !important;
+            height: 25% !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <h1>Arduino Weather</h1>
+    <button id="refreshButton" onclick="refreshData()">Refresh Data</button>
+    <canvas id="weatherChart"></canvas>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('weatherChart').getContext('2d');
+            let weatherChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2025-02-10 10:00:00', '2025-02-10 11:00:00', '2025-02-10 12:00:00', '2025-02-10 13:00:00', '2025-02-10 14:00:00'],
+                    datasets: [{
+                        label: 'Temperature (°C)',
+                        data: [22.5, 23.0, 21.5, 24.0, 22.0],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Timestamp'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Temperature (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        function refreshData() {
+            // Placeholder function for refreshing data
+            alert('Data refreshed!');
+            // Example of updating the chart data
+            weatherChart.data.labels.push('2025-02-10 12:00:00');
+            weatherChart.data.datasets[0].data.push(23.5);
+            weatherChart.update();
+        }
+    </script>
+</body>
+</html>

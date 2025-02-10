@@ -5,5 +5,5 @@ class FileManager {
 public:
     static std::string FilePath;
     static bool AppendData(std::string data);
-    static std::vector<Data> GetData();
+    static void GetData(std::vector<Data>& data);
 };

@@ -22,8 +22,7 @@ void APService::setup()
     // if empty will auto generate SSID, if password is blank it will be anonymous AP (wm.autoConnect())
     // then goes into a blocking loop awaiting configuration and will return success result
 
-    bool res;
-    res = wm.autoConnect(); // auto generated AP name from chipid
+    bool res = wm.autoConnect(); // auto generated AP name from chipid
     if (!res)
     {
         res = wm.autoConnect("Sebastians ESP32", "password"); // password protected ap
@@ -42,3 +41,4 @@ void APService::setup()
         Serial.println("connected...yeey :)");
     }
 }
+// Guest_HX912433

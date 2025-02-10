@@ -77,7 +77,7 @@ void WebServerService::setup()
 {
   // Serial port for debugging purposes
   Serial.begin(115200);
-
+  Serial.println("WebServerService setup");
   pinMode(2, OUTPUT);
   digitalWrite(2, LOW);
   pinMode(4, OUTPUT);
