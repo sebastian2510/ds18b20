@@ -12,7 +12,7 @@ using json = nlohmann::json;
 
 std::string FileManager::FilePath = "/data.json";
 
-bool FileManager::AppendData(Data data)
+bool FileManager::AppendData(WeatherData data)
 {
     if (data.Temperature == 0 || data.TimeStamp.empty())
     {
@@ -32,7 +32,7 @@ bool FileManager::AppendData(Data data)
     return false;
 }
 
-void FileManager::GetData(std::vector<Data>& data)
+void FileManager::GetData(std::vector<WeatherData>& data)
 {
     if (FilePath.empty())
     {

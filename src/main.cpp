@@ -14,7 +14,7 @@ const int daylightOffset_sec = 0;
 #define TEMP_SENSOR 23
 #define BUTTON 4
 
-std::vector<Data> data;
+std::vector<WeatherData> data;
 
 void setup()
 {
@@ -48,7 +48,7 @@ void loop()
     return;
   }
 
-  Data data;
+  WeatherData data;
   // Read temperature sensor
   data.Temperature = analogRead(TEMP_SENSOR);
   // Get current time

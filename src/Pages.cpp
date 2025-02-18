@@ -10,6 +10,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arduino Weather</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,61 +29,158 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
-    <h1>Arduino Weather</h1>
-    <button id="refreshButton" onclick="refreshData()">Refresh Data</button>
-    <canvas id="weatherChart"></canvas>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Arduino Weather</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('weatherChart').getContext('2d');
-            let weatherChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['2025-02-10 10:00:00', '2025-02-10 11:00:00', '2025-02-10 12:00:00', '2025-02-10 13:00:00', '2025-02-10 14:00:00'],
-                    datasets: [{
-                        label: 'Temperature (°C)',
-                        data: [22.5, 23.0, 21.5, 24.0, 22.0],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        fill: false
-                    }]
-                },
-                options: {
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'hour'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Timestamp'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Temperature (°C)'
-                            }
-                        }
-                    }
-                }
-            });
-        });
-
-        function refreshData() {
-            // Placeholder function for refreshing data
-            alert('Data refreshed!');
-            // Example of updating the chart data
-            weatherChart.data.labels.push('2025-02-10 12:00:00');
-            weatherChart.data.datasets[0].data.push(23.5);
-            weatherChart.update();
-        }
-    </script>
+    <div class="container">
+        <h1>Arduino Weather</h1>
+        <button id="refreshButton" class="btn btn-primary" onclick="DownloadData()">Download Data</button>
+        <canvas id="weatherChart"></canvas>
+    </div>
 </body>
 </html>
+<script>
+    // Gem i en variabel for at beholde data ved reload af siden
+let weatherData = {
+    "temperature": [],
+    "timestamp": []
+};
+
+const maxLength = 5 / 1440;
+
+
+let weatherChart;
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('weatherChart').getContext('2d');
+    weatherChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weatherData.timestamp,
+            datasets: [{
+                label: 'Temperature (°C)',
+                data: weatherData.temperature,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'hour'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Timestamp'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Temperature (°C)'
+                    }
+                }
+            }
+        }
+    });
+
+    window.refreshData = function() {
+        fetch('./data.json')
+            .then(response => response.json())
+            .then(data => {
+                const newestData = data[data.length - 1];
+                weatherChart.data.labels.push(newestData.timestamp);
+                weatherChart.data.datasets[0].data.push(newestData.temperature);
+                weatherChart.update();
+            });
+    };
+});
+
+function WebSocket() {
+    let ws = new WebSocket("ws://localhost:8080/ws");
+    ws.onopen = function () {
+        console.log("Connected");
+        ws.send("Hello, Server!");
+    };
+
+    ws.onmessage = function (evt) {
+        console.log(evt.data);
+        let data = JSON.parse(evt.data);
+        // Append to the weatherData object
+        AddData(data.temperature, data.timestamp);
+        console.log(weatherData);
+    };
+
+    // Startup 
+    fetch('./data.json')
+        .then(response => response.json())
+        .then(data => {
+            weatherData = data;
+        });
+}
+
+function AddData(temp, timestamp) {
+    if (!temp || !timestamp) {
+        return;
+    }
+
+    // Append data to the weatherData object
+    weatherData.temperature.push(temp);
+    weatherData.timestamp.push(timestamp);
+
+
+
+    weatherChart.data.labels.push(timestamp);
+    weatherChart.data.datasets[0].data.push(temp);
+
+        // Remove the oldest data points if the arrays exceed the maximum length
+        if (weatherData.temperature.length > maxLength) {
+            weatherChart.data.labels.shift();
+        }
+        if (weatherData.timestamp.length > maxLength) {
+            weatherChart.data.datasets[0].data.shift();
+        }
+
+    weatherChart.update();
+}
+
+// Download data.json with weatherData
+function DownloadData() {
+    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(weatherData));
+    const a = document.createElement('a');
+    a.href = data;
+    a.download = 'data.json';
+    a.click();
+}
+</script>
     )rawliteral";
 
 const char Pages::login_html[] PROGMEM = R"rawliteral(

@@ -4,6 +4,6 @@
 class WebSocketService
 {
 public:
-    static void SendData(Data data);
+    static void SendData(WeatherData data);
     static void setup(AsyncWebServer *server);
 };

@@ -32,7 +32,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 }
 
 
-void WebSocketService::SendData(Data data)
+void WebSocketService::SendData(WeatherData data)
 {
     String json = "{\"Temperature\": " + String(data.Temperature) + ", \"TimeStamp\": \"" + String(data.TimeStamp.c_str()) + "\"}";
 
