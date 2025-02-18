@@ -1,12 +1,9 @@
+#include "FileManager.h"
 #include <fstream>
 #include <iostream>
 #include <ctime>
-#include <WeatherData.h>
-#include <FileManager.h>
-#include <nlohmann/json.hpp> 
-#include <nlohmann/json_fwd.hpp>
-#include <include/nlohmann/json_fwd.hpp>
-#include <include/nlohmann/json.hpp>
+#include <nlohmann/json.hpp>
+#include "Models/WeatherData.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -15,18 +12,32 @@ std::string FileManager::FilePath = "/data.json";
 
 bool FileManager::AppendData(WeatherData data)
 {
-    if (data.Temperature == 0 || data.TimeStamp.empty())
+    if (data.getTemperature() == 0 || data.getTimeStamp().empty())
     {
         return false;
     }
 
     json jsonData;
-    ifstream File(FilePath);
+    ifstream inFile(FilePath);
 
-    if (File.is_open())
+    if (inFile.is_open())
     {
-        File >> jsonData;
-        File.close();
+        inFile >> jsonData;
+        inFile.close();
+    }
+
+    json newData = {
+        {"Temperature", data.getTemperature()},
+        {"TimeStamp", data.getTimeStamp()}
+    };
+
+    jsonData.push_back(newData);
+
+    ofstream outFile(FilePath);
+    if (outFile.is_open())
+    {
+        outFile << jsonData.dump(4);
+        outFile.close();
         return true;
     }
 
@@ -40,15 +51,15 @@ void FileManager::GetData(std::vector<WeatherData>& data)
         return;
     }
 
-    ifstream File(FilePath);
+    ifstream inFile(FilePath);
 
-    if (!File.is_open())
+    if (!inFile.is_open())
     {
         return;
     }
 
     json jsonData;
-    File >> jsonData;
+    inFile >> jsonData;
 
     if (jsonData.empty())
     {
@@ -57,8 +68,11 @@ void FileManager::GetData(std::vector<WeatherData>& data)
 
     for (const auto& item : jsonData)
     {
-        data.emplace_back(item.dump());
+        WeatherData weatherData;
+        weatherData.setTemperature(item["Temperature"]);
+        weatherData.setTimeStamp(item["TimeStamp"]);
+        data.push_back(weatherData);
     }
 
-    File.close();
+    inFile.close();
 }

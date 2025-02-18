@@ -1,4 +1,4 @@
-#include <WeatherData.h>
+#include <Models/WeatherData.h>
 #include <ESPAsyncWebServer.h>
 
 class WebSocketService

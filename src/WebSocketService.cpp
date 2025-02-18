@@ -3,9 +3,9 @@
 #include <ESPAsyncWebServer.h>
 #include <WebServerService.h>
 #include <nlohmann/json.hpp>
-#include <WeatherData.h>
+#include <Models/WeatherData.h>
 #include <iostream>
-
+#include <WebSocketService.h>
 AsyncWebSocket ws("/ws");
 
 void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len)
@@ -33,7 +33,7 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
 
 void WebSocketService::SendData(WeatherData data)
 {
-    String json = "{\"Temperature\": " + String(data.Temperature) + ", \"TimeStamp\": \"" + String(data.TimeStamp.c_str()) + "\"}";
+    String json = "{\"Temperature\": " + String(data.getTemperature()) + ", \"TimeStamp\": \"" + String(data.getTimeStamp().c_str()) + "\"}";
 
     ws.textAll(json);
 }

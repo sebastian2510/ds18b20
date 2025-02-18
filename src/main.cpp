@@ -3,22 +3,18 @@
 #include <WebServerService.h>
 #include <APService.h>
 #include <vector>
-#include <WeatherData.h>
+#include <Models/WeatherData.h>
 #include <FileManager.h> 
 #include <WebSocketService.h> 
 #include <NTPService.h>
+#include <SensorService.h>
 
-const char *ntpServer = "dk.pool.ntp.org";
-const long gmtOffset_sec = 3600;
-const int daylightOffset_sec = 0;
-#define TEMP_SENSOR 23
 #define BUTTON 4
 
 std::vector<WeatherData> data;
 
 void setup()
 {
-  pinMode(TEMP_SENSOR, INPUT);
   pinMode(BUTTON, INPUT_PULLUP);
   Serial.begin(115200);
   Serial.println("Setting up APService");
@@ -29,15 +25,18 @@ void setup()
   WebServerService::setup();
   Serial.println("Setup done for WebServerService & WebSocketService");
   
-  Serial.println("Fetching data");
   FileManager::GetData(data);
 }
 
 void loop()
 {
+  double temperature = SensorService::getTemperatures();
+  Serial.println(temperature);
+  Serial.println(digitalRead(BUTTON));
   // If the button is pressed down for 10 seconds
   if (digitalRead(BUTTON) == LOW)
   {
+    Serial.println("Button pressed");
     delay(10000);
     if (digitalRead(BUTTON) == LOW)
     {
@@ -50,16 +49,18 @@ void loop()
 
   WeatherData data;
   // Read temperature sensor
-  data.Temperature = analogRead(TEMP_SENSOR);
+  data.setTemperature(temperature); ;
   // Get current time
   struct tm timeinfo = NTPService::getTime();
   char buffer[30];
   // Format the time
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
-  data.TimeStamp = buffer;
+  data.setTimeStamp(buffer);
   WebSocketService::SendData(data);
 
   if (!FileManager::AppendData(data)) {
     Serial.println("Failed to append data");
   }
+
+  delay(2000);
 }
