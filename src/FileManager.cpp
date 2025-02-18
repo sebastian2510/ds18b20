@@ -5,19 +5,31 @@
 #include <nlohmann/json.hpp> 
 #include <nlohmann/json_fwd.hpp>
 #include <include/nlohmann/json_fwd.hpp>
+#include <include/nlohmann/json.hpp>
 
 using namespace std;
 using json = nlohmann::json;
 
 std::string FileManager::FilePath = "/data.json";
 
-bool FileManager::AppendData(std::string data)
+bool FileManager::AppendData(Data data)
 {
-    if (data.empty())
+    if (data.Temperature == 0 || data.TimeStamp.empty())
     {
         return false;
     }
-    return true;
+
+    json jsonData;
+    ifstream File(FilePath);
+
+    if (File.is_open())
+    {
+        File >> jsonData;
+        File.close();
+        return true;
+    }
+
+    return false;
 }
 
 void FileManager::GetData(std::vector<Data>& data)

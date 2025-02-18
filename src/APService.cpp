@@ -2,6 +2,8 @@
 #include <WiFiManager.h>
 #include "APService.h"
 
+WiFiManager wm;
+
 void APService::setup()
 {
     WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
@@ -11,7 +13,6 @@ void APService::setup()
     Serial.begin(115200);
 
     // WiFiManager, Local intialization. Once its business is done, there is no need to keep it around
-    WiFiManager wm;
 
     // reset settings - wipe stored credentials for testing
     // these are stored by the esp library
@@ -40,5 +41,11 @@ void APService::setup()
         // if you get here you have connected to the WiFi
         Serial.println("connected...yeey :)");
     }
+}
+
+void APService::Disconnect()
+{
+    WiFi.disconnect();
+    wm.resetSettings();
 }
 // Guest_HX912433
