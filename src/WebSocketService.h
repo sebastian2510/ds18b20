@@ -1,9 +1,9 @@
-#include <Data.h>
+#include <TestWeatherData.h>
 #include <ESPAsyncWebServer.h>
 
 class WebSocketService
 {
 public:
-    static void SendData(WeatherData data);
+    static void SendData(TestWeatherData data);
     static void setup(AsyncWebServer *server);
 };

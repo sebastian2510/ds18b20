@@ -1,6 +1,6 @@
 #include <string>
 
-class WeatherData
+class TestWeatherData
 {
 public:
     double Temperature;
