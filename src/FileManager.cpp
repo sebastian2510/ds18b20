@@ -1,7 +1,8 @@
-#include "FileManager.h"
 #include <fstream>
 #include <iostream>
 #include <ctime>
+#include <WeatherData.h>
+#include <FileManager.h>
 #include <nlohmann/json.hpp> 
 #include <nlohmann/json_fwd.hpp>
 #include <include/nlohmann/json_fwd.hpp>
@@ -12,7 +13,7 @@ using json = nlohmann::json;
 
 std::string FileManager::FilePath = "/data.json";
 
-bool FileManager::AppendData(TestWeatherData data)
+bool FileManager::AppendData(WeatherData data)
 {
     if (data.Temperature == 0 || data.TimeStamp.empty())
     {
@@ -32,7 +33,7 @@ bool FileManager::AppendData(TestWeatherData data)
     return false;
 }
 
-void FileManager::GetData(std::vector<TestWeatherData>& data)
+void FileManager::GetData(std::vector<WeatherData>& data)
 {
     if (FilePath.empty())
     {

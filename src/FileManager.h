@@ -1,9 +1,9 @@
 #include <string>
-#include <TestWeatherData.h>
+#include <WeatherData.h>
 #include <vector>
 class FileManager {
 public:
     static std::string FilePath;
-    static bool AppendData(TestWeatherData data);
-    static void GetData(std::vector<TestWeatherData>& data);
+    static bool AppendData(WeatherData data);
+    static void GetData(std::vector<WeatherData>& data);
 };

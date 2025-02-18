@@ -3,7 +3,7 @@
 #include <WebServerService.h>
 #include <APService.h>
 #include <vector>
-#include "Data.h"
+#include <WeatherData.h>
 #include <FileManager.h> 
 #include <WebSocketService.h> 
 #include <NTPService.h>
@@ -14,7 +14,7 @@ const int daylightOffset_sec = 0;
 #define TEMP_SENSOR 23
 #define BUTTON 4
 
-std::vector<TestWeatherData> data;
+std::vector<WeatherData> data;
 
 void setup()
 {
@@ -48,7 +48,7 @@ void loop()
     return;
   }
 
-  TestWeatherData data;
+  WeatherData data;
   // Read temperature sensor
   data.Temperature = analogRead(TEMP_SENSOR);
   // Get current time
