@@ -13,8 +13,6 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
     if (type == WS_EVT_CONNECT)
     {
         Serial.printf("ws[%s][%u] connect\n", server->url(), client->id());
-        client->printf("Hello Client %u :)", client->id());
-        client->ping();
     }
     else if (type == WS_EVT_DISCONNECT)
     {
@@ -38,10 +36,10 @@ void WebSocketService::SendData(WeatherData data)
     {
         Serial.println("Client: " + String(client.id()));
     }
-    Serial.println("Done printing clients");
-    
-    String json = "{\"Temperature\": " + String(data.getTemperature()) + ", \"TimeStamp\": \"" + String(data.getTimeStamp().c_str()) + "\"}";
 
+    Serial.println(data.getTemperature());
+    String json = "{\"Temperature\": " + String(data.getTemperature()) + ", \"TimeStamp\": \"" + String(data.getTimeStamp().c_str()) + "\"}";
+    Serial.println(json);
     ws.textAll(json);
 }
 

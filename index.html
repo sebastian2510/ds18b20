@@ -65,8 +65,7 @@ let weatherData = {
     "timestamp": []
 };
 
-const maxLength = 5 / 1440;
-
+const maxLength = 100; // Example: keep only the latest 100 data points
 
 let weatherChart;
 document.addEventListener('DOMContentLoaded', function() {
@@ -106,16 +105,38 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     window.refreshData = function() {
-        fetch('./data.json')
+        fetch('/data.json')
             .then(response => response.json())
             .then(data => {
-                const newestData = data[data.length - 1];
+                const newestData = data;
                 weatherChart.data.labels.push(newestData.timestamp);
                 weatherChart.data.datasets[0].data.push(newestData.temperature);
+                weatherData = data;
                 weatherChart.update();
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
     };
 });
+
+function startData() {
+        fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                weatherChart.data.labels.push(data.TimeStamp);
+                weatherChart.data.datasets[0].data.push(data.Temperature);
+                console.log('Data:', data);
+                weatherData.temperature.push(data.Temperature);
+                weatherData.timestamp.push(data.TimeStamp);
+                console.log('Elements in weatherdata:', weatherData.temperature.length);
+
+                weatherChart.update();
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
 
 function setupWebSocket() {
     console.log("Setting up WebSocket connection...");
@@ -123,14 +144,13 @@ function setupWebSocket() {
     ws.onopen = function () {
         console.log("Connected");
         ws.send("Hello, Server!");
+        startData();
     };
 
     ws.onmessage = function (evt) {
         console.log(evt.data);
         let data = JSON.parse(evt.data);
         // Append to the weatherData object
-        AddData(data.temperature, data.timestamp);
-        console.log(weatherData);
     };
 
     ws.onclose = function () {
@@ -145,27 +165,27 @@ function setupWebSocket() {
 
 // Initialize WebSocket connection
 setupWebSocket();
+
 function AddData(temp, timestamp) {
     if (!temp || !timestamp) {
+        console.log("Invalid data received:", temp, timestamp);
         return;
     }
+
+    console.log("Adding data:", temp, timestamp);
 
     // Append data to the weatherData object
     weatherData.temperature.push(temp);
     weatherData.timestamp.push(timestamp);
 
-
-
     weatherChart.data.labels.push(timestamp);
     weatherChart.data.datasets[0].data.push(temp);
 
-        // Remove the oldest data points if the arrays exceed the maximum length
-        if (weatherData.temperature.length > maxLength) {
-            weatherChart.data.labels.shift();
-        }
-        if (weatherData.timestamp.length > maxLength) {
-            weatherChart.data.datasets[0].data.shift();
-        }
+    // Remove the oldest data points if the arrays exceed the maximum length
+    if (weatherChart.data.labels.length > maxLength) {
+        weatherChart.data.labels.shift();
+        weatherChart.data.datasets[0].data.shift();
+    }
 
     weatherChart.update();
 }

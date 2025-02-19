@@ -5,7 +5,7 @@
 class WeatherData
 {
 private:
-    int temperature;
+    double temperature;
     std::string timeStamp;
 
 public:
@@ -13,13 +13,13 @@ public:
     WeatherData() : temperature(0), timeStamp("") {}
 
     // Parameterized constructor
-    WeatherData(int temp, const std::string& time) : temperature(temp), timeStamp(time) {}
+    WeatherData(double temp, const std::string& time) : temperature(temp), timeStamp(time) {}
 
     // Getter for Temperature
-    int getTemperature() const { return temperature; }
+    double getTemperature() const { return temperature; }
 
     // Setter for Temperature
-    void setTemperature(int temp) { temperature = temp; }
+    void setTemperature(double temp) { temperature = temp; }
 
     // Getter for TimeStamp
     std::string getTimeStamp() const { return timeStamp; }
