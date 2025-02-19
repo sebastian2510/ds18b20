@@ -9,14 +9,13 @@
 #include <vector>
 #include <models/WeatherData.h>
 
-
 const char *PARAM_INPUT_1 = "output";
 const char *PARAM_INPUT_2 = "state";
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-void WebServerService::setup(std::vector<WeatherData>& data)
+void WebServerService::setup(std::vector<WeatherData> &data)
 {
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -31,20 +30,7 @@ void WebServerService::setup(std::vector<WeatherData>& data)
 
   // Route to get data.json
   server.on("/data", HTTP_GET, [&data](AsyncWebServerRequest *request)
-            {
-              String json = "[";
-              for (const auto& item : data)
-              {
-                json += "{\"Temperature\": " + String(item.getTemperature()) + ", \"TimeStamp\": \"" + item.getTimeStamp().c_str() + "\"},";
-              }
-
-              json.remove(json.length() - 1);
-              json += "]";
-              request->send(200, "application/json", json);
-
-            });
-
-
+            { request->send(200, "application/json", FileManager::ConvertDataToJson(data).dump().c_str()); });
 
   // server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request)
   //           { request->send(200, "text/html", Pages::login_html); });

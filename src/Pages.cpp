@@ -114,10 +114,12 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('/data.json')
             .then(response => response.json())
             .then(data => {
-                const newestData = data;
-                weatherChart.data.labels.push(newestData.timestamp);
-                weatherChart.data.datasets[0].data.push(newestData.temperature);
-                weatherData = data;
+                data.forEach(entry => {
+                    weatherChart.data.labels.push(entry.TimeStamp);
+                    weatherChart.data.datasets[0].data.push(entry.Temperature);
+                    weatherData.temperature.push(entry.Temperature);
+                    weatherData.timestamp.push(entry.TimeStamp);
+                });
                 weatherChart.update();
             })
             .catch(error => {
@@ -127,22 +129,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function startData() {
-        fetch('/data')
-            .then(response => response.json())
-            .then(data => {
-                weatherChart.data.labels.push(data.TimeStamp);
-                weatherChart.data.datasets[0].data.push(data.Temperature);
-                console.log('Data:', data);
-                weatherData.temperature.push(data.Temperature);
-                weatherData.timestamp.push(data.TimeStamp);
-                console.log('weatherdata:', weatherData);
-
-                weatherChart.update();
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
+    fetch('/data')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(entry => {
+                weatherChart.data.labels.push(entry.TimeStamp);
+                weatherChart.data.datasets[0].data.push(entry.Temperature);
+                weatherData.temperature.push(entry.Temperature);
+                weatherData.timestamp.push(entry.TimeStamp);
             });
-    }
+            weatherChart.update();
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
 
 function setupWebSocket() {
     console.log("Setting up WebSocket connection...");
@@ -157,6 +158,8 @@ function setupWebSocket() {
         console.log(evt.data);
         let data = JSON.parse(evt.data);
         // Append to the weatherData object
+        AddData(data.Temperature, data.TimeStamp);
+        console.log(weatherData);
     };
 
     ws.onclose = function () {

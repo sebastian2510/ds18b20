@@ -131,3 +131,17 @@ void FileManager::ClearData()
         outFile.close();
     }
 }
+
+json FileManager::ConvertDataToJson(std::vector<WeatherData>& data)
+{
+    json jsonData;
+    for (const auto& item : data)
+    {
+        json newData = {
+            {"Temperature", item.getTemperature()},
+            {"TimeStamp", item.getTimeStamp()}
+        };
+        jsonData.push_back(newData);
+    }
+    return jsonData;
+}
