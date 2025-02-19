@@ -21,15 +21,11 @@ void setup()
   APService::setup();
   Serial.println("Setup done for APService");
 
-
-
-
-
   Serial.println("Setting up FileManager/SPIFFS");
   FileManager::setup();
   Serial.println("Setup done for FileManager/SPIFFS");
 
-  FileManager::ClearData();
+  // FileManager::ClearData();
 
   Serial.println("Setting up NTPService");
   NTPService::setup();
