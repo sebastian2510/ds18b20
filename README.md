@@ -49,7 +49,6 @@ Det er sat op i følgende rækkefølge:
 5. Læs tidligere json data gemt på arduinoen
 6. Start Webserveren med hjemmesiden
 7. Start websocketen for at kunne sende data til hjemmesiden
-_____
 
 _____
 
