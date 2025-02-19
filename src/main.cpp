@@ -75,6 +75,12 @@ void loop()
     return;
   }
   double temperature = SensorService::getTemperatures();
+
+  if (temperature == -127) {
+    Serial.println("Failed to read temperature");
+    return;
+  }
+
   WeatherData data;
   // Read temperature sensor
   data.setTemperature(temperature); ;
@@ -84,11 +90,13 @@ void loop()
   // Format the time
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
   data.setTimeStamp(buffer);
-  WebSocketService::SendData(data);
+  if (!WebSocketService::SendData(data)) {
+    Serial.println("Failed to send data");
+  }
 
   if (!FileManager::AppendData(data)) {
     Serial.println("Failed to append data");
   }
 
-  delay(10000);
+  delay(1000);
 }
