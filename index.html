@@ -100,13 +100,13 @@
 
 </html>
 <script>
-    // Gem i en variabel for at beholde data ved reload af siden
+    // Weather data object
     let weatherData = {
         "temperature": [],
         "timestamp": []
     };
 
-    const maxLength = 100; // Example: keep only the latest 100 data points
+    const maxLength = 100;
 
     let weatherChart;
     document.addEventListener('DOMContentLoaded', function () {
@@ -165,6 +165,7 @@
         };
     });
 
+    // Fetch the start data
     function startData() {
         fetch('/data')
             .then(response => response.json())
@@ -187,6 +188,7 @@
             });
     }
 
+    // Setup WebSocket connection
     function setupWebSocket() {
         console.log("Setting up WebSocket connection...");
         let ws = new WebSocket("ws://192.168.1.204/ws");
@@ -219,6 +221,7 @@
     // Initialize WebSocket connection
     setupWebSocket();
 
+    // Reset WiFi
     function ResetWifi() {
         fetch('/reset-wifi')
             .then(response => response.json())
@@ -230,6 +233,7 @@
             });
     }
 
+    // Add data to the weatherData object and update the chart
     function AddData(temp, timestamp) {
         if (!temp || !timestamp) {
             console.log("Invalid data received:", temp, timestamp);
