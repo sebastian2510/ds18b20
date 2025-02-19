@@ -8,6 +8,7 @@
 #include <FileManager.h>
 #include <vector>
 #include <models/WeatherData.h>
+#include <APService.h>
 
 const char *PARAM_INPUT_1 = "output";
 const char *PARAM_INPUT_2 = "state";
@@ -31,6 +32,13 @@ void WebServerService::setup(std::vector<WeatherData> &data)
   // Route to get data.json
   server.on("/data", HTTP_GET, [&data](AsyncWebServerRequest *request)
             { request->send(200, "application/json", FileManager::ConvertDataToJson(data).dump().c_str()); });
+
+    server.on("/reset-wifi", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              request->send(200, "text/html", "Resetting WiFi...");
+              APService::Disconnect();
+              APService::setup();
+            });
 
   // server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request)
   //           { request->send(200, "text/html", Pages::login_html); });

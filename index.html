@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,14 +11,16 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         #refreshButton {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
+
         #weatherChart {
             margin-top: 20px;
-            width: 60% !important;
+            width: 100% !important;
             height: 25% !important;
         }
     </style>
@@ -27,87 +30,150 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="border: 1px solid gray; border-radius: 10px;">
         <a class="navbar-brand" href="#">Arduino Weather</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" data-toggle="tab" href="#mainContent">
+                        Home
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                    <a class="nav-link" data-toggle="tab" href="#servicePanel">Features</a>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <div class="container">
-        <h1>Arduino Weather</h1>
-        <button id="refreshButton" class="btn btn-primary" onclick="DownloadData()">Download Data</button>
-        <canvas id="weatherChart"></canvas>
+    <div class="container mt-4">
+        <!-- Tab content -->
+        <div class="tab-content">
+            <!-- Main content with temperature -->
+            <div class="tab-pane fade show active" id="mainContent">
+                <div class="current-temp">
+                    <span>Latest temperature: </span>
+                    <span id="currentTemp">--.-</span>
+                    <span class="temp-unit">C</span>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        Weather Chart
+                    </div>
+                    <div class="card-body">
+                        <div class="container">
+ 
+                            <canvas id="weatherChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="servicePanel">
+                <div class="card">
+                    <div class="card-header">
+                        Features 
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-outline-danger" id="resetWifiBtn" onclick="ResetWifi()">
+                                Nulstil WiFi
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-outline-primary" id="exportDataBtn" onclick="DownloadData()">
+                                Download Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
+
 </html>
 <script>
     // Gem i en variabel for at beholde data ved reload af siden
-let weatherData = {
-    "temperature": [],
-    "timestamp": []
-};
+    let weatherData = {
+        "temperature": [],
+        "timestamp": []
+    };
 
-const maxLength = 100; // Example: keep only the latest 100 data points
+    const maxLength = 100; // Example: keep only the latest 100 data points
 
-let weatherChart;
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('weatherChart').getContext('2d');
-    weatherChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: weatherData.timestamp,
-            datasets: [{
-                label: 'Temperature (°C)',
-                data: weatherData.temperature,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                fill: false
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'hour'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Timestamp'
+    let weatherChart;
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('weatherChart').getContext('2d');
+        weatherChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: weatherData.timestamp,
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: weatherData.temperature,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                resposive: true,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        suggestedMin: 15,
+                        suggestedMax: 30
                     }
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Temperature (°C)'
-                    }
-                }
+
+                animation: {
+                    duration: 500
+                },
+
+                barPercentage: 0.9,
+                categoryPercentage: 0.9
             }
-        }
+        });
+
+        window.refreshData = function () {
+            fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data) {
+                        console.error('Invalid data received from /data:', data);
+                        return;
+                    }
+
+                    data.forEach(entry => {
+                        weatherChart.data.labels.push(entry.TimeStamp);
+                        weatherChart.data.datasets[0].data.push(entry.Temperature);
+                        weatherData.temperature.push(entry.Temperature);
+                        weatherData.timestamp.push(entry.TimeStamp);
+                    });
+                    weatherChart.update();
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        };
     });
 
-    window.refreshData = function() {
-        fetch('/data.json')
+    function startData() {
+        fetch('/data')
             .then(response => response.json())
             .then(data => {
+                if (!data) {
+                    console.error('Invalid data received in start data:', data);
+                    return;
+                }
+
                 data.forEach(entry => {
                     weatherChart.data.labels.push(entry.TimeStamp);
                     weatherChart.data.datasets[0].data.push(entry.Temperature);
@@ -119,86 +185,81 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
-    };
-});
+    }
 
-function startData() {
-    fetch('/data')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(entry => {
-                weatherChart.data.labels.push(entry.TimeStamp);
-                weatherChart.data.datasets[0].data.push(entry.Temperature);
-                weatherData.temperature.push(entry.Temperature);
-                weatherData.timestamp.push(entry.TimeStamp);
+    function setupWebSocket() {
+        console.log("Setting up WebSocket connection...");
+        let ws = new WebSocket("ws://192.168.1.204/ws");
+        ws.onopen = function () {
+            console.log("Connected");
+            ws.send("Hello, Server!");
+            startData();
+        };
+
+        ws.onmessage = function (evt) {
+            console.log(evt.data);
+            let data = JSON.parse(evt.data);
+            // Append to the weatherData object
+            AddData(data.Temperature, data.TimeStamp);
+            console.log(weatherData);
+            // Set span with id currentTemp to the current temperature
+            document.getElementById('currentTemp').innerText = data.Temperature;
+        };
+
+        ws.onclose = function () {
+            console.log("Disconnected, attempting to reconnect...");
+            setTimeout(setupWebSocket, 1000); // Attempt to reconnect every second
+        };
+
+        ws.onerror = function (error) {
+            console.log("WebSocket Error: " + error);
+        };
+    }
+
+    // Initialize WebSocket connection
+    setupWebSocket();
+
+    function ResetWifi() {
+        fetch('/reset-wifi')
+            .then(response => response.json())
+            .then(data => {
+                alert('WiFi has been reset');
+            })
+            .catch(error => {
+                console.error('Error resetting WiFi:', error);
             });
-            weatherChart.update();
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-}
-
-function setupWebSocket() {
-    console.log("Setting up WebSocket connection...");
-    let ws = new WebSocket("ws://192.168.1.204/ws");
-    ws.onopen = function () {
-        console.log("Connected");
-        ws.send("Hello, Server!");
-        startData();
-    };
-
-    ws.onmessage = function (evt) {
-        console.log(evt.data);
-        let data = JSON.parse(evt.data);
-        // Append to the weatherData object
-        AddData(data.Temperature, data.TimeStamp);
-        console.log(weatherData);
-    };
-
-    ws.onclose = function () {
-        console.log("Disconnected, attempting to reconnect...");
-        setTimeout(setupWebSocket, 1000); // Attempt to reconnect every second
-    };
-
-    ws.onerror = function (error) {
-        console.log("WebSocket Error: " + error);
-    };
-}
-
-// Initialize WebSocket connection
-setupWebSocket();
-
-function AddData(temp, timestamp) {
-    if (!temp || !timestamp) {
-        console.log("Invalid data received:", temp, timestamp);
-        return;
     }
 
-    console.log("Adding data:", temp, timestamp);
+    function AddData(temp, timestamp) {
+        if (!temp || !timestamp) {
+            console.log("Invalid data received:", temp, timestamp);
+            return;
+        }
 
-    // Append data to the weatherData object
-    weatherData.temperature.push(temp);
-    weatherData.timestamp.push(timestamp);
+        console.log("Adding data:", temp, timestamp);
 
-    weatherChart.data.labels.push(timestamp);
-    weatherChart.data.datasets[0].data.push(temp);
+        // Append data to the weatherData object
+        weatherData.temperature.push(temp);
+        weatherData.timestamp.push(timestamp);
 
-    // Remove the oldest data points if the arrays exceed the maximum length
-    if (weatherChart.data.labels.length > maxLength) {
-        weatherChart.data.labels.shift();
-        weatherChart.data.datasets[0].data.shift();
+        weatherChart.data.labels.push(timestamp);
+        weatherChart.data.datasets[0].data.push(temp);
+
+        // Remove the oldest data points if the arrays exceed the maximum length
+        if (weatherChart.data.labels.length > maxLength) {
+            weatherChart.data.labels.shift();
+            weatherChart.data.datasets[0].data.shift();
+        }
+
+        weatherChart.update();
     }
 
-    weatherChart.update();
-}
-
-// Download data.json with weatherData
-function DownloadData() {
-    const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(weatherData));
-    const a = document.createElement('a');
-    a.href = data;
-    a.download = 'data.json';
-    a.click();
-}
+    // Download data.json with weatherData
+    function DownloadData() {
+        const data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(weatherData, null, 4));
+        const a = document.createElement('a');
+        a.href = data;
+        a.download = 'data.json';
+        a.click();
+    }
 </script>

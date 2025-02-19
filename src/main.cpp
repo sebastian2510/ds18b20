@@ -79,5 +79,5 @@ void loop()
     Serial.println("Failed to append data");
   }
 
-  delay(2000);
+  delay(10000);
 }
