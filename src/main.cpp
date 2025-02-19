@@ -60,8 +60,7 @@ void setup()
 
 void loop()
 {
-  double temperature = SensorService::getTemperatures();
-  Serial.println(temperature);
+
   Serial.println(digitalRead(BUTTON));
   // If the button is pressed down for 10 seconds
   if (digitalRead(BUTTON) == LOW)
@@ -76,7 +75,7 @@ void loop()
     }
     return;
   }
-
+  double temperature = SensorService::getTemperatures();
   WeatherData data;
   // Read temperature sensor
   data.setTemperature(temperature); ;
@@ -85,6 +84,7 @@ void loop()
   char buffer[30];
   // Format the time
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  Serial.println(temperature);
   Serial.println(buffer);
   data.setTimeStamp(buffer);
   WebSocketService::SendData(data);
