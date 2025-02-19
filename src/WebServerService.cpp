@@ -10,12 +10,18 @@
 #include <models/WeatherData.h>
 #include <APService.h>
 
-const char *PARAM_INPUT_1 = "output";
-const char *PARAM_INPUT_2 = "state";
-
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
+/**
+ * @brief Sets up the web server service.
+ * 
+ * This function initializes the serial port for debugging, prints the ESP's local IP address,
+ * and sets up various routes for the web server, including the root page, a data endpoint,
+ * and a WiFi reset endpoint. It also starts the WebSocket service and begins the server.
+ * 
+ * @param data A reference to a vector of WeatherData objects that will be used to provide data for the /data endpoint.
+ */
 void WebServerService::setup(std::vector<WeatherData> &data)
 {
   // Serial port for debugging purposes
@@ -39,9 +45,6 @@ void WebServerService::setup(std::vector<WeatherData> &data)
               APService::Disconnect();
               APService::setup();
             });
-
-  // server.on("/login", HTTP_GET, [](AsyncWebServerRequest *request)
-  //           { request->send(200, "text/html", Pages::login_html); });
 
   // Starting websocket server
   WebSocketService::setup(&server);

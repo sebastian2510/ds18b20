@@ -13,6 +13,20 @@
 
 std::vector<WeatherData> data;
 
+/**
+ * @brief Sets up the necessary services and components for the application.
+ * 
+ * This function performs the following setup tasks:
+ * - Configures the BUTTON pin as an input with an internal pull-up resistor.
+ * - Initializes the serial communication at a baud rate of 115200.
+ * - Sets up the APService.
+ * - Sets up the FileManager/SPIFFS.
+ * - Optionally clears data from the FileManager (commented out).
+ * - Sets up the NTPService.
+ * - Sets up the SensorService.
+ * - Retrieves data from a file using the FileManager.
+ * - Sets up the WebServerService and WebSocketService with the retrieved data.
+ */
 void setup()
 {
   pinMode(BUTTON, INPUT_PULLUP);

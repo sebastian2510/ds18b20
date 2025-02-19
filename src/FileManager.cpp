@@ -67,6 +67,19 @@ bool FileManager::AppendData(WeatherData data)
     return false;
 }
 
+/**
+ * @brief Retrieves weather data from a file and populates the provided vector.
+ * 
+ * This function attempts to read weather data from a file specified by the FilePath member.
+ * If the file does not exist, it creates an empty JSON array in the file. If the file is empty
+ * or the JSON data is empty, the function returns without modifying the vector.
+ * 
+ * @param data A reference to a vector of WeatherData objects that will be populated with the data read from the file.
+ * 
+ * @note This function uses the SPIFFS library to handle file operations and the nlohmann::json library for JSON parsing.
+ * 
+ * @exception std::exception If any exception occurs during file operations or JSON parsing, it is caught and the error message is printed to the Serial monitor.
+ */
 void FileManager::GetData(std::vector<WeatherData>& data)
 {
     try
@@ -122,6 +135,13 @@ void FileManager::GetData(std::vector<WeatherData>& data)
     }
 }
 
+/**
+ * @brief Clears the data in the specified file by initializing it with an empty JSON array.
+ *
+ * This function opens the file specified by the FilePath member variable in write mode.
+ * If the file is successfully opened, it writes an empty JSON array ("[]") to the file
+ * and then closes the file.
+ */
 void FileManager::ClearData()
 {
     File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
@@ -132,6 +152,16 @@ void FileManager::ClearData()
     }
 }
 
+/**
+ * @brief Converts a vector of WeatherData objects to a JSON array.
+ * 
+ * This function iterates through a vector of WeatherData objects and converts each
+ * object into a JSON object containing the temperature and timestamp. The resulting
+ * JSON objects are then added to a JSON array, which is returned.
+ * 
+ * @param data A reference to a vector of WeatherData objects to be converted.
+ * @return json A JSON array containing the converted WeatherData objects.
+ */
 json FileManager::ConvertDataToJson(std::vector<WeatherData>& data)
 {
     json jsonData;
