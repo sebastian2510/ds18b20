@@ -113,6 +113,8 @@ void FileManager::GetData(std::vector<WeatherData>& data)
             weatherData.setTimeStamp(item["TimeStamp"]);
             data.push_back(weatherData);
         }
+
+        Serial.println("Elements in vector: " + String(data.size()));
     }
     catch(const std::exception& e)
     {

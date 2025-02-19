@@ -32,7 +32,6 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -124,8 +123,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-function WebSocket() {
-    let ws = new WebSocket("ws://localhost:8080/ws");
+function setupWebSocket() {
+    console.log("Setting up WebSocket connection...");
+    let ws = new WebSocket("ws://192.168.1.204/ws");
     ws.onopen = function () {
         console.log("Connected");
         ws.send("Hello, Server!");
@@ -139,14 +139,18 @@ function WebSocket() {
         console.log(weatherData);
     };
 
-    // Startup 
-    fetch('./data.json')
-        .then(response => response.json())
-        .then(data => {
-            weatherData = data;
-        });
+    ws.onclose = function () {
+        console.log("Disconnected, attempting to reconnect...");
+        setTimeout(setupWebSocket, 1000); // Attempt to reconnect every second
+    };
+
+    ws.onerror = function (error) {
+        console.log("WebSocket Error: " + error);
+    };
 }
 
+// Initialize WebSocket connection
+setupWebSocket();
 function AddData(temp, timestamp) {
     if (!temp || !timestamp) {
         return;
