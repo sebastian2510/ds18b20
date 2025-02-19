@@ -55,13 +55,6 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
  */
 void WebSocketService::SendData(WeatherData data)
 {
-
-    for (auto& client : ws.getClients())
-    {
-        Serial.println("Client: " + String(client.id()));
-    }
-
-    Serial.println(data.getTemperature());
     String json = "{\"Temperature\": " + String(data.getTemperature()) + ", \"TimeStamp\": \"" + String(data.getTimeStamp().c_str()) + "\"}";
     Serial.println(json);
     ws.textAll(json);

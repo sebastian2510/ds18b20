@@ -61,7 +61,6 @@ void setup()
 void loop()
 {
 
-  Serial.println(digitalRead(BUTTON));
   // If the button is pressed down for 10 seconds
   if (digitalRead(BUTTON) == LOW)
   {
@@ -84,8 +83,6 @@ void loop()
   char buffer[30];
   // Format the time
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
-  Serial.println(temperature);
-  Serial.println(buffer);
   data.setTimeStamp(buffer);
   WebSocketService::SendData(data);
 

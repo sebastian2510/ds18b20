@@ -1,0 +1,51 @@
+[wokwi]
+version = "1.0.0"
+firmware = ".pio/build/esp32doit-devkit-v1/firmware.bin"
+elf = ".pio/build/esp32doit-devkit-v1/firmware.elf"
+
+[project]
+name = "Arduino Weather Station"
+description = "A weather station project using Arduino and various sensors."
+
+# Define the components used in the project
+[[components]]
+type = "esp32"
+id = "esp32"
+name = "ESP32 Dev Board"
+
+[[components]]
+type = "dht22"
+id = "dht22"
+name = "DHT22 Temperature and Humidity Sensor"
+pin = 4
+
+[[components]]
+type = "ssd1306"
+id = "oled"
+name = "SSD1306 OLED Display"
+i2c_address = "0x3C"
+sda = 21
+scl = 22
+
+[[components]]
+type = "button"
+id = "button"
+name = "Push Button"
+pin = 0
+
+# Define the connections between components
+[[connections]]
+from = "esp32:gpio4"
+to = "dht22:pin"
+
+[[connections]]
+from = "esp32:gpio21"
+to = "oled:sda"
+
+[[connections]]
+from = "esp32:gpio22"
+to = "oled:scl"
+
+[[connections]]
+from = "esp32:gpio0"
+to = "button:pin"
