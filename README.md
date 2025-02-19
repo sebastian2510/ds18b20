@@ -64,3 +64,6 @@ _____
 Loop funktionen i main.cpp starter med at tjekke om knappen er trykket nede, hvis den er det vil den lave et sleep på 10 sekunder og tjekke igen, hvis den stadig er det vil internet forbindelsen bliver resetted.
 Efterfølgende henter den temperaturen, tiden hvor den også formatere den, gemmer disse værdier i en variabel og påbegynder at sende dataen via. websocketen. Den vil efterfølgende indsætte de værdier til datafilen.
 _____
+
+### Diagram
+![Diagram](image.png)

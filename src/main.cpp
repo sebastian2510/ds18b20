@@ -39,7 +39,7 @@ void setup()
   FileManager::setup();
   Serial.println("Setup done for FileManager/SPIFFS");
 
-  // FileManager::ClearData();
+  FileManager::ClearData();
 
   Serial.println("Setting up NTPService");
   NTPService::setup();
