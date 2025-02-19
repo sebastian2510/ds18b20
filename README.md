@@ -36,6 +36,7 @@ denne fil håndtere loading af div. moduler og kalde funktioner til at sende & g
 * .h: Indeholder funktionsforskrifter men uden funktionalitet.
 * .cpp: Opstarter websocketen for at data kan modtages af en klient som der lytter med.
 
+_____
 
 ### Opstart
 For at dele kode og funktionalitet op, har jeg lavet forskellige setup funktioner til hver af de forskellige typer som kræver en form for initialisering.
@@ -48,13 +49,19 @@ Det er sat op i følgende rækkefølge:
 5. Læs tidligere json data gemt på arduinoen
 6. Start Webserveren med hjemmesiden
 7. Start websocketen for at kunne sende data til hjemmesiden
+_____
+
+_____
 
 ### Ip'er
 Hvis der ikke er tilsluttet et netværk, vil ip'en være 192.168.4.1 hvor internettet skal konfigureres ved at tislutte det oprettet access point og tilgå http://192.168.4.1/, men hvis den connecter til et wifi bliver ip'en 192.168.1.204 og data hjemmesiden kan så findes på http://192.168.1.204/
+_____
 
 ### Frontend
 Hjemmesiden er lavet med plain html, css og javascript alt i en side med <script> tag.
+_____
 
 ### Loop
 Loop funktionen i main.cpp starter med at tjekke om knappen er trykket nede, hvis den er det vil den lave et sleep på 10 sekunder og tjekke igen, hvis den stadig er det vil internet forbindelsen bliver resetted.
 Efterfølgende henter den temperaturen, tiden hvor den også formatere den, gemmer disse værdier i en variabel og påbegynder at sende dataen via. websocketen. Den vil efterfølgende indsætte de værdier til datafilen.
+_____
