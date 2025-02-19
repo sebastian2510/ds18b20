@@ -26,7 +26,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
 
         #weatherChart {
             margin-top: 20px;
-            width: 60% !important;
+            width: 100% !important;
             height: 25% !important;
         }
     </style>
@@ -38,7 +38,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" style="border: 1px solid gray; border-radius: 10px;">
         <a class="navbar-brand" href="#">Arduino Weather</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,34 +64,36 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
             <!-- Main content with temperature -->
             <div class="tab-pane fade show active" id="mainContent">
                 <div class="current-temp">
+                    <span>Latest temperature: </span>
                     <span id="currentTemp">--.-</span>
                     <span class="temp-unit">C</span>
                 </div>
                 <div class="card">
+                    <div class="card-header">
+                        Weather Chart
+                    </div>
                     <div class="card-body">
                         <div class="container">
-                            <h1>Arduino Weather</h1>
-                            <button id="refreshButton" class="btn btn-primary" onclick="DownloadData()">Download Data</button>
+ 
                             <canvas id="weatherChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Service panel -->
             <div class="tab-pane fade" id="servicePanel">
                 <div class="card">
                     <div class="card-header">
-                        Service Menu
+                        Features 
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <button class="btn btn-warning" id="resetWifiBtn" onclick="ResetWifi()">
+                            <button class="btn btn-outline-danger" id="resetWifiBtn" onclick="ResetWifi()">
                                 Nulstil WiFi
                             </button>
                         </div>
                         <div class="mb-3">
-                            <button class="btn btn-info" id="exportDataBtn" onclick="DownloadData()">
+                            <button class="btn btn-outline-primary" id="exportDataBtn" onclick="DownloadData()">
                                 Download Data
                             </button>
                         </div>

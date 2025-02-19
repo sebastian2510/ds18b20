@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include "time.h"
 #include <iostream>
+#include <APService.h>
 
 const char *ntpServer = "pool.ntp.org";
 const long gmtOffset_sec = 3600;
@@ -25,6 +26,9 @@ struct tm NTPService::getTime()
     if (!getLocalTime(&timeinfo))
     {
         Serial.println("Failed to obtain time");
+        APService::Disconnect();
+        APService::setup();
+
     }
     return timeinfo;
 }
