@@ -24,8 +24,22 @@ void setup()
   Serial.println("Setting up WebServerService & WebSocketService");
   WebServerService::setup();
   Serial.println("Setup done for WebServerService & WebSocketService");
-  
+
+  Serial.println("Setting up FileManager/SPIFFS");
+  FileManager::setup();
+  Serial.println("Setup done for FileManager/SPIFFS");
+
+  Serial.println("Setting up NTPService");
+  NTPService::setup();
+  Serial.println("Setup done for NTPService");
+
+  Serial.println("Setting up SensorService");
+  SensorService::setup();
+  Serial.println("Setup done for SensorService");
+
+  Serial.println("Getting data from file");
   FileManager::GetData(data);
+  Serial.println("Data retrieved from file");
 }
 
 void loop()
@@ -55,6 +69,7 @@ void loop()
   char buffer[30];
   // Format the time
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  Serial.println(buffer);
   data.setTimeStamp(buffer);
   WebSocketService::SendData(data);
 

@@ -6,4 +6,5 @@ public:
     static std::string FilePath;
     static bool AppendData(WeatherData data);
     static void GetData(std::vector<WeatherData>& data);
+    static void setup();
 };

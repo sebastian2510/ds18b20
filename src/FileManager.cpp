@@ -1,7 +1,6 @@
+#include <Arduino.h>
 #include "FileManager.h"
-#include <fstream>
-#include <iostream>
-#include <ctime>
+#include <SPIFFS.h>
 #include <nlohmann/json.hpp>
 #include "Models/WeatherData.h"
 
@@ -10,19 +9,42 @@ using json = nlohmann::json;
 
 std::string FileManager::FilePath = "/data.json";
 
+void FileManager::setup() {
+    if (!SPIFFS.begin(true))
+    {
+        Serial.println("An Error has occurred while mounting SPIFFS");
+        return;
+    }
+
+    // Create the file if it does not exist
+    if (!SPIFFS.exists(FilePath.c_str())) {
+        File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
+        if (outFile) {
+            outFile.print("[]"); // Initialize with an empty JSON array
+            outFile.close();
+        }
+    }
+}
+
 bool FileManager::AppendData(WeatherData data)
 {
     if (data.getTemperature() == 0 || data.getTimeStamp().empty())
     {
+        Serial.println(String(data.getTemperature()));
+        Serial.println(data.getTimeStamp().c_str());
         return false;
     }
 
     json jsonData;
-    ifstream inFile(FilePath);
+    File inFile = SPIFFS.open(FilePath.c_str(), FILE_READ);
 
-    if (inFile.is_open())
+    if (inFile)
     {
-        inFile >> jsonData;
+        String fileContent = inFile.readString();
+        if (!fileContent.isEmpty())
+        {
+            jsonData = json::parse(fileContent.c_str());
+        }
         inFile.close();
     }
 
@@ -33,46 +55,67 @@ bool FileManager::AppendData(WeatherData data)
 
     jsonData.push_back(newData);
 
-    ofstream outFile(FilePath);
-    if (outFile.is_open())
+    File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
+    if (outFile)
     {
-        outFile << jsonData.dump(4);
+        outFile.print(jsonData.dump(4).c_str());
         outFile.close();
         return true;
     }
 
+    Serial.println("Failed to open file");
     return false;
 }
 
 void FileManager::GetData(std::vector<WeatherData>& data)
 {
-    if (FilePath.empty())
+    try
     {
-        return;
+        if (FilePath.empty())
+        {
+            return;
+        }
+
+        File inFile = SPIFFS.open(FilePath.c_str(), FILE_READ);
+
+        if (!inFile)
+        {
+            // File does not exist, create it
+            File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
+            if (outFile)
+            {
+                outFile.print("[]"); // Initialize with an empty JSON array
+                outFile.close();
+            }
+            return;
+        }
+
+        String fileContent = inFile.readString();
+        inFile.close();
+
+        if (fileContent.isEmpty())
+        {
+            Serial.println("File is empty");
+            return;
+        }
+
+        json jsonData = json::parse(fileContent.c_str());
+
+        if (jsonData.empty())
+        {
+            return;
+        }
+
+        for (const auto& item : jsonData)
+        {
+            WeatherData weatherData;
+            weatherData.setTemperature(item["Temperature"]);
+            weatherData.setTimeStamp(item["TimeStamp"]);
+            data.push_back(weatherData);
+        }
     }
-
-    ifstream inFile(FilePath);
-
-    if (!inFile.is_open())
+    catch(const std::exception& e)
     {
-        return;
+        Serial.println(e.what());
     }
-
-    json jsonData;
-    inFile >> jsonData;
-
-    if (jsonData.empty())
-    {
-        return;
-    }
-
-    for (const auto& item : jsonData)
-    {
-        WeatherData weatherData;
-        weatherData.setTemperature(item["Temperature"]);
-        weatherData.setTimeStamp(item["TimeStamp"]);
-        data.push_back(weatherData);
-    }
-
-    inFile.close();
 }
