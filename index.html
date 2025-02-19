@@ -129,7 +129,7 @@ function startData() {
                 console.log('Data:', data);
                 weatherData.temperature.push(data.Temperature);
                 weatherData.timestamp.push(data.TimeStamp);
-                console.log('Elements in weatherdata:', weatherData.temperature.length);
+                console.log('weatherdata:', weatherData);
 
                 weatherChart.update();
             })

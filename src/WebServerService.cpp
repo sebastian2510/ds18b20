@@ -6,6 +6,8 @@
 #include <WebSocketService.h>
 #include <SPIFFS.h>
 #include <FileManager.h>
+#include <vector>
+#include <models/WeatherData.h>
 
 
 const char *PARAM_INPUT_1 = "output";
@@ -14,7 +16,7 @@ const char *PARAM_INPUT_2 = "state";
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
 
-void WebServerService::setup()
+void WebServerService::setup(std::vector<WeatherData>& data)
 {
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -28,14 +30,12 @@ void WebServerService::setup()
             { request->send(200, "text/html", Pages::index_html); });
 
   // Route to get data.json
-  server.on("/data", HTTP_GET, [](AsyncWebServerRequest *request)
+  server.on("/data", HTTP_GET, [&data](AsyncWebServerRequest *request)
             {
-              std::vector<WeatherData> data;
-              FileManager::GetData(data);
               String json = "[";
-              for (auto &d : data)
+              for (const auto& item : data)
               {
-                json += "{\"Temperature\": " + String(d.getTemperature()) + ", \"TimeStamp\": \"" + String(d.getTimeStamp().c_str()) + "\"},";
+                json += "{\"Temperature\": " + String(item.getTemperature()) + ", \"TimeStamp\": \"" + item.getTimeStamp().c_str() + "\"},";
               }
 
               json.remove(json.length() - 1);

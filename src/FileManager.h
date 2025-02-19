@@ -7,4 +7,5 @@ public:
     static bool AppendData(WeatherData data);
     static void GetData(std::vector<WeatherData>& data);
     static void setup();
+    static void ClearData();
 };

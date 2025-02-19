@@ -21,13 +21,15 @@ void setup()
   APService::setup();
   Serial.println("Setup done for APService");
 
-  Serial.println("Setting up WebServerService & WebSocketService");
-  WebServerService::setup();
-  Serial.println("Setup done for WebServerService & WebSocketService");
+
+
+
 
   Serial.println("Setting up FileManager/SPIFFS");
   FileManager::setup();
   Serial.println("Setup done for FileManager/SPIFFS");
+
+  FileManager::ClearData();
 
   Serial.println("Setting up NTPService");
   NTPService::setup();
@@ -40,6 +42,10 @@ void setup()
   Serial.println("Getting data from file");
   FileManager::GetData(data);
   Serial.println("Data retrieved from file");
+
+  Serial.println("Setting up WebServerService & WebSocketService");
+  WebServerService::setup(data);
+  Serial.println("Setup done for WebServerService & WebSocketService");
 }
 
 void loop()

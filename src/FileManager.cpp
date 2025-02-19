@@ -121,3 +121,13 @@ void FileManager::GetData(std::vector<WeatherData>& data)
         Serial.println(e.what());
     }
 }
+
+void FileManager::ClearData()
+{
+    File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
+    if (outFile)
+    {
+        outFile.print("[]"); // Initialize with an empty JSON array
+        outFile.close();
+    }
+}
