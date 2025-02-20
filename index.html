@@ -78,7 +78,7 @@
             <div class="tab-pane fade" id="servicePanel">
                 <div class="card">
                     <div class="card-header">
-                        Features 
+                        Features
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
@@ -151,11 +151,22 @@
                         return;
                     }
 
+                    // Clear existing data
+                    weatherChart.data.labels = [];
+                    weatherChart.data.datasets[0].data = [];
+                    weatherData.temperature = [];
+                    weatherData.timestamp = [];
+
                     data.forEach(entry => {
-                        weatherChart.data.labels.push(entry.TimeStamp);
-                        weatherChart.data.datasets[0].data.push(entry.Temperature);
-                        weatherData.temperature.push(entry.Temperature);
-                        weatherData.timestamp.push(entry.TimeStamp);
+                        if (!weatherData.temperature.includes(entry.TimeStamp)) {
+                            weatherData.temperature.push(entry.Temperature);
+                            weatherData.timestamp.push(entry.TimeStamp);
+                        }
+
+                        if (!weatherChart.data.labels.includes(entry.TimeStamp)) {
+                            weatherChart.data.labels.push(entry.TimeStamp);
+                            weatherChart.data.datasets[0].data.push(entry.Temperature);
+                        }
                     });
                     weatherChart.update();
                 })
@@ -175,11 +186,22 @@
                     return;
                 }
 
+                // Clear existing data
+                weatherChart.data.labels = [];
+                weatherChart.data.datasets[0].data = [];
+                weatherData.temperature = [];
+                weatherData.timestamp = [];
+
                 data.forEach(entry => {
-                    weatherChart.data.labels.push(entry.TimeStamp);
-                    weatherChart.data.datasets[0].data.push(entry.Temperature);
-                    weatherData.temperature.push(entry.Temperature);
-                    weatherData.timestamp.push(entry.TimeStamp);
+                    if (!weatherData.temperature.includes(entry.TimeStamp)) {
+                        weatherData.temperature.push(entry.Temperature);
+                        weatherData.timestamp.push(entry.TimeStamp);
+                    }
+
+                    if (!weatherChart.data.labels.includes(entry.TimeStamp)) {
+                        weatherChart.data.labels.push(entry.TimeStamp);
+                        weatherChart.data.datasets[0].data.push(entry.Temperature);
+                    }
                 });
                 weatherChart.update();
             })
@@ -191,7 +213,7 @@
     // Setup WebSocket connection
     function setupWebSocket() {
         console.log("Setting up WebSocket connection...");
-        let ws = new WebSocket("ws://192.168.1.204/ws");
+        let ws = new WebSocket("ws://192.168.0.220/ws");
         ws.onopen = function () {
             console.log("Connected");
             ws.send("Hello, Server!");
@@ -242,12 +264,23 @@
 
         console.log("Adding data:", temp, timestamp);
 
-        // Append data to the weatherData object
-        weatherData.temperature.push(temp);
-        weatherData.timestamp.push(timestamp);
+        // Check if the data already exists
+        if (weatherData.timestamp.includes(timestamp)) {
+            console.log("Data already exists for timestamp:", timestamp);
+            return;
+        }
 
-        weatherChart.data.labels.push(timestamp);
-        weatherChart.data.datasets[0].data.push(temp);
+        // Append data to the weatherData object
+        if (!weatherData.timestamp.includes(timestamp)) {
+            weatherData.temperature.push(temp);
+            weatherData.timestamp.push(timestamp);
+        }
+
+        if (!weatherChart.data.labels.includes(timestamp)) {
+            weatherChart.data.labels.push(timestamp);
+            weatherChart.data.datasets[0].data.push(temp);
+        }
+
 
         // Remove the oldest data points if the arrays exceed the maximum length
         if (weatherChart.data.labels.length > maxLength) {

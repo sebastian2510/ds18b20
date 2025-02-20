@@ -55,10 +55,9 @@ void onWsEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
  */
 bool WebSocketService::SendData(WeatherData data)
 {
-    if (ws.count() == 0 || !ws.availableForWriteAll() || ws.getClients().size() == 0)
+    if (ws.count() == 0 || ws.getClients().size() == 0)
     {
         Serial.println(ws.count());
-        Serial.println(ws.availableForWriteAll());
         Serial.println(ws.getClients().size());
         return false;
     }

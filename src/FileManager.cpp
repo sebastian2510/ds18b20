@@ -18,11 +18,15 @@ void FileManager::setup() {
 
     // Create the file if it does not exist
     if (!SPIFFS.exists(FilePath.c_str())) {
+        Serial.println("File does not exist, creating new file"); // Debugging statement
         File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
         if (outFile) {
             outFile.print("[]"); // Initialize with an empty JSON array
             outFile.close();
         }
+    }
+    else {
+        Serial.println("File exists");
     }
 }
 
@@ -30,8 +34,7 @@ bool FileManager::AppendData(WeatherData data)
 {
     if (data.getTemperature() == 0 || data.getTimeStamp().empty())
     {
-        Serial.println(String(data.getTemperature()));
-        Serial.println(data.getTimeStamp().c_str());
+        Serial.println("Invalid data: Temperature is 0 or TimeStamp is empty");
         return false;
     }
 
@@ -47,6 +50,10 @@ bool FileManager::AppendData(WeatherData data)
         }
         inFile.close();
     }
+    else
+    {
+        Serial.println("Failed to open file for reading");
+    }
 
     json newData = {
         {"Temperature", data.getTemperature()},
@@ -60,10 +67,11 @@ bool FileManager::AppendData(WeatherData data)
     {
         outFile.print(jsonData.dump(4).c_str());
         outFile.close();
+        Serial.println("Data appended successfully");
         return true;
     }
 
-    Serial.println("Failed to open file");
+    Serial.println("Failed to open file for writing");
     return false;
 }
 
@@ -86,6 +94,7 @@ void FileManager::GetData(std::vector<WeatherData>& data)
     {
         if (FilePath.empty())
         {
+            Serial.println("File path is empty"); // Debugging statement
             return;
         }
 
@@ -94,6 +103,7 @@ void FileManager::GetData(std::vector<WeatherData>& data)
         if (!inFile)
         {
             // File does not exist, create it
+            Serial.println("File does not exist, creating new file"); // Debugging statement
             File outFile = SPIFFS.open(FilePath.c_str(), FILE_WRITE);
             if (outFile)
             {
@@ -106,6 +116,7 @@ void FileManager::GetData(std::vector<WeatherData>& data)
         String fileContent = inFile.readString();
         inFile.close();
 
+
         if (fileContent.isEmpty())
         {
             Serial.println("File is empty");
@@ -116,6 +127,7 @@ void FileManager::GetData(std::vector<WeatherData>& data)
 
         if (jsonData.empty())
         {
+            Serial.println("JSON data is empty"); // Debugging statement
             return;
         }
 

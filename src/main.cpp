@@ -39,7 +39,7 @@ void setup()
   FileManager::setup();
   Serial.println("Setup done for FileManager/SPIFFS");
 
-  FileManager::ClearData();
+  //FileManager::ClearData();
 
   Serial.println("Setting up NTPService");
   NTPService::setup();
@@ -98,5 +98,5 @@ void loop()
     Serial.println("Failed to append data");
   }
 
-  delay(1000 * (60 * 5)); // 5 minutes
+  delay(2000); // 1000 * (60 * 5) 5 minutes
 }

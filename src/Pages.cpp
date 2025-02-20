@@ -84,7 +84,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
             <div class="tab-pane fade" id="servicePanel">
                 <div class="card">
                     <div class="card-header">
-                        Features 
+                        Features
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
@@ -106,13 +106,13 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
 
 </html>
 <script>
-    // Gem i en variabel for at beholde data ved reload af siden
+    // Weather data object
     let weatherData = {
         "temperature": [],
         "timestamp": []
     };
 
-    const maxLength = 100; // Example: keep only the latest 100 data points
+    const maxLength = 100;
 
     let weatherChart;
     document.addEventListener('DOMContentLoaded', function () {
@@ -157,11 +157,22 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
                         return;
                     }
 
+                    // Clear existing data
+                    weatherChart.data.labels = [];
+                    weatherChart.data.datasets[0].data = [];
+                    weatherData.temperature = [];
+                    weatherData.timestamp = [];
+
                     data.forEach(entry => {
-                        weatherChart.data.labels.push(entry.TimeStamp);
-                        weatherChart.data.datasets[0].data.push(entry.Temperature);
-                        weatherData.temperature.push(entry.Temperature);
-                        weatherData.timestamp.push(entry.TimeStamp);
+                        if (!weatherData.temperature.includes(entry.TimeStamp)) {
+                            weatherData.temperature.push(entry.Temperature);
+                            weatherData.timestamp.push(entry.TimeStamp);
+                        }
+
+                        if (!weatherChart.data.labels.includes(entry.TimeStamp)) {
+                            weatherChart.data.labels.push(entry.TimeStamp);
+                            weatherChart.data.datasets[0].data.push(entry.Temperature);
+                        }
                     });
                     weatherChart.update();
                 })
@@ -171,6 +182,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
         };
     });
 
+    // Fetch the start data
     function startData() {
         fetch('/data')
             .then(response => response.json())
@@ -180,11 +192,22 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
                     return;
                 }
 
+                // Clear existing data
+                weatherChart.data.labels = [];
+                weatherChart.data.datasets[0].data = [];
+                weatherData.temperature = [];
+                weatherData.timestamp = [];
+
                 data.forEach(entry => {
-                    weatherChart.data.labels.push(entry.TimeStamp);
-                    weatherChart.data.datasets[0].data.push(entry.Temperature);
-                    weatherData.temperature.push(entry.Temperature);
-                    weatherData.timestamp.push(entry.TimeStamp);
+                    if (!weatherData.temperature.includes(entry.TimeStamp)) {
+                        weatherData.temperature.push(entry.Temperature);
+                        weatherData.timestamp.push(entry.TimeStamp);
+                    }
+
+                    if (!weatherChart.data.labels.includes(entry.TimeStamp)) {
+                        weatherChart.data.labels.push(entry.TimeStamp);
+                        weatherChart.data.datasets[0].data.push(entry.Temperature);
+                    }
                 });
                 weatherChart.update();
             })
@@ -193,9 +216,10 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
             });
     }
 
+    // Setup WebSocket connection
     function setupWebSocket() {
         console.log("Setting up WebSocket connection...");
-        let ws = new WebSocket("ws://192.168.1.204/ws");
+        let ws = new WebSocket("ws://192.168.0.220/ws");
         ws.onopen = function () {
             console.log("Connected");
             ws.send("Hello, Server!");
@@ -225,6 +249,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
     // Initialize WebSocket connection
     setupWebSocket();
 
+    // Reset WiFi
     function ResetWifi() {
         fetch('/reset-wifi')
             .then(response => response.json())
@@ -236,6 +261,7 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
             });
     }
 
+    // Add data to the weatherData object and update the chart
     function AddData(temp, timestamp) {
         if (!temp || !timestamp) {
             console.log("Invalid data received:", temp, timestamp);
@@ -244,12 +270,23 @@ const char Pages::index_html[] PROGMEM = R"rawliteral(
 
         console.log("Adding data:", temp, timestamp);
 
-        // Append data to the weatherData object
-        weatherData.temperature.push(temp);
-        weatherData.timestamp.push(timestamp);
+        // Check if the data already exists
+        if (weatherData.timestamp.includes(timestamp)) {
+            console.log("Data already exists for timestamp:", timestamp);
+            return;
+        }
 
-        weatherChart.data.labels.push(timestamp);
-        weatherChart.data.datasets[0].data.push(temp);
+        // Append data to the weatherData object
+        if (!weatherData.timestamp.includes(timestamp)) {
+            weatherData.temperature.push(temp);
+            weatherData.timestamp.push(timestamp);
+        }
+
+        if (!weatherChart.data.labels.includes(timestamp)) {
+            weatherChart.data.labels.push(timestamp);
+            weatherChart.data.datasets[0].data.push(temp);
+        }
+
 
         // Remove the oldest data points if the arrays exceed the maximum length
         if (weatherChart.data.labels.length > maxLength) {
